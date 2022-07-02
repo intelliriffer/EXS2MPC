@@ -73,6 +73,7 @@ let isExpanded = false;
 const DWORD = 4;
 const INT16 = 2;
 const BYTE = 1;
+let oTime = 0;
 
 const MPC_TEMPLATES = {
     MASTER: fs.readFileSync(path.join(__dirname, "keyMasterTemplate.xml")).toString(),
@@ -97,6 +98,8 @@ Sox is required to convert aif to wav files,
 Without Some Aif and Wav files might not load up!       
 **************************************************`);
 }
+
+oTime = getLTime();
 
 EXS.forEach(exs => process(exs));
 ANSI.GREEN(`\n*************** ALL OPERATIONS COMPLETED ****************\n`);
@@ -153,7 +156,15 @@ function process(f) {
                 ANSI.ERROR("Error Invalid 0x03 Chunk!");
                 return false;
             }
-            exo.samples.push(createSample(fExs, si, size + 84));
+            try {
+                exo.samples.push(createSample(fExs, si, size + 84));
+            }
+            catch (e) {
+                cleanup(fExs);
+                //     console.log(size);
+                ANSI.ERROR(e);
+                return false;
+            }
 
         }
 
@@ -240,7 +251,8 @@ function createSample(fid, ix, size) {
     S.type = readByteSum(fid, DWORD, ix + 112);
     S.path = readStr(fid, 256, ix + 164);
     S.fileName = readStr(fid, size > 420 ? 256 : 64, size > 420 ? ix + 420 : ix + 20);
-    //console.log(S.name, S.fileName);
+    //  if (S.name != S.fileName && S.name.trim() != "") S.fileName = S.name;
+    if (S.fileName.trim() == "" || S.fileName == undefined) throw (`Error:Blank/Corrupt Sample File in EXS! :: Skipped!`);
 
     return (S);
 
@@ -338,7 +350,7 @@ function validateSamples(j, f) {
             formatError = true;
         }
 
-        if (!formaterror && !fs.existsSync(tFile)) {
+        if (!formaterror && !sampleExists(tFile)) {
             let src = path.join(j.samples[i].path, j.samples[i].fileName);
 
             if (!fs.existsSync(src)) {
@@ -348,7 +360,7 @@ function validateSamples(j, f) {
                 fs.copyFileSync(src, tFile);
             }
         }
-        if (noerror && wavConvert && useSOX) {
+        if (!formaterror && noerror && wavConvert && useSOX) {
             let oExt = tFile.split(".").slice(-1)[0];
             let fExt = ".WAV";
             if (oExt.toLowerCase() == "wav") {
@@ -356,19 +368,24 @@ function validateSamples(j, f) {
             }
             let tmp = path.join(path.dirname(tFile), 'tmp.WAV');
             let wFile = tFile.split(".").slice(0, -1).join(".") + fExt;
-            try {
-                let sxCmd = `sox "${tFile}" -t wavpcm "${tmp}"`;
+            if (!fs.existsSync(wFile) || (fs.existsSync(wFile) && oTime > fs.statSync(wFile).ctimeMs)) {
+                try {
+                    let sxCmd = `sox "${tFile}" -t wavpcm "${tmp}"`;
 
-                let sox = require('child_process').execSync(sxCmd, { stdio: [] }).toString();
-                fs.copyFileSync(tmp, wFile);
-                fs.unlinkSync(tmp);
-                if (oExt.toLowerCase() == "aif") {
-                    fs.unlinkSync(tFile);
+                    let sox = require('child_process').execSync(sxCmd, { stdio: [] }).toString();
+                    fs.copyFileSync(tmp, wFile);
+                    fs.unlinkSync(tmp);
+                    if (oExt.toLowerCase() == "aif") {
+                        fs.unlinkSync(tFile);
+                    }
+
+                } catch (e) {
+                    ANSI.ERROR('SOX Conversion Failed for Sample!')
+                    console.log(e.message);
+                    noerror = false;
                 }
-
-            } catch (e) {
-                ANSI.ERROR('SOX Conversion Failed for Sample!')
-                console.log(e);
+            } else {
+                //    console.log("skipped ", wFile);
             }
         }
     }
@@ -559,4 +576,19 @@ function addDrumMap(template, dMap) {
     template = template.replace('</Instruments>', `</Instruments>\n${d}`);
     return template;
 
+}
+
+function getLTime() {
+    let f = path.join(__dirname, "now.tmp");
+    fs.writeFileSync(f, "-");
+    let cTime = fs.statSync(f).ctimeMs;
+    fs.unlinkSync(f);
+    return cTime;
+
+}
+function sampleExists(f) {
+    let fn = f.split(".").slice(0, -1).join(".");
+    if (fs.existsSync(f)) return true;
+    if (fs.existsSync(fn + ".wav")) return true;
+    if (fs.existsSync(fn + ".WAV")) return true;
 }
