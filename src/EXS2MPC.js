@@ -17,9 +17,9 @@ USAGE:
 
 OR
 1. Double Click the convert_mac.sh (Mac) or convert_win.bat (windows) Script.
-2: Mac Users, if convet_mac.sh is not running, use terminal 
+2: Mac Users, if convert_mac.sh is not running, use terminal 
 and use command chmod +x convert_mac.sh
-if its still not running try the comamnd : sudo xattre -cr convert_mac.sh
+if its still not running try the comamnd : sudo xattr -cr convert_mac.sh
 
 
 
