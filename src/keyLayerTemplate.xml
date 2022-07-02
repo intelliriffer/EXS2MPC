@@ -1,0 +1,31 @@
+
+          <Layer number="##NUM##">
+            <Active>True</Active>
+            <Volume>##VOLUME##</Volume>
+            <Pan>##PAN##</Pan>
+            <Pitch>0.000000</Pitch>
+            <TuneCoarse>##COARSE##</TuneCoarse>
+            <TuneFine>##CENTS##</TuneFine>
+            <VelStart>##VELSTART##</VelStart>
+            <VelEnd>##VELEND##</VelEnd>
+            <SampleStart>0</SampleStart>
+            <SampleEnd>0</SampleEnd>
+            <Loop>False</Loop>
+            <LoopStart>0</LoopStart>
+            <LoopEnd>0</LoopEnd>
+            <LoopCrossfadeLength>0</LoopCrossfadeLength>
+            <LoopTune>0</LoopTune>
+            <Mute>False</Mute>
+            <RootNote>##ROOT##</RootNote>
+            <KeyTrack>True</KeyTrack>
+            <SampleName>##SAMPLE##</SampleName>
+            <SampleFile></SampleFile>
+            <SliceIndex>129</SliceIndex>
+            <Direction>0</Direction>
+            <Offset>0</Offset>
+            <SliceStart>##SAMPLESTART##</SliceStart>
+            <SliceEnd>##LOOPEND##</SliceEnd>
+            <SliceLoopStart>##LOOPSTART##</SliceLoopStart>
+            <SliceLoop>##DOLOOP##</SliceLoop>
+            <SliceLoopCrossFadeLength>0</SliceLoopCrossFadeLength>
+          </Layer> 

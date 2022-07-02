@@ -1,0 +1,32 @@
+ <Instrument number="##ID##">
+        <TuneCoarse>##COARSE##</TuneCoarse>
+        <TuneFine>##FINE##</TuneFine>
+        <Mono>False</Mono>
+        <Polyphony>16</Polyphony>
+        <FilterKeytrack>0.000000</FilterKeytrack>
+        <LowNote>##LOW##</LowNote>
+        <HighNote>##HIGH##</HighNote>
+        <IgnoreBaseNote>False</IgnoreBaseNote>
+        <ZonePlay>1</ZonePlay>
+        <OneShot>##ONESHOT##</OneShot>
+        <FilterType>2</FilterType>
+        <VolumeHold>0.000000</VolumeHold>
+        <VolumeDecayType>True</VolumeDecayType>
+        <VolumeADEnvelope>True</VolumeADEnvelope>
+        <VolumeAttack>0.000000</VolumeAttack>
+        <VolumeDecay>0.000000</VolumeDecay>
+        <VolumeSustain>1.000000</VolumeSustain>
+        <VolumeRelease>0.000000</VolumeRelease>
+        <VelocityToPitch>0.000000</VelocityToPitch>
+        <VelocityToVolumeAttack>0.000000</VelocityToVolumeAttack>
+        <VelocitySensitivity>1.000000</VelocitySensitivity>
+        <VelocityToPan>0.000000</VelocityToPan>
+   <LFO LfoNum="0">
+       <Type>Sine</Type>
+       <Rate>0.700000</Rate>
+       <LfoPitch>0.044000</LfoPitch>
+   </LFO>
+        <Layers>
+         ##LAYERS##
+        </Layers>
+      </Instrument>

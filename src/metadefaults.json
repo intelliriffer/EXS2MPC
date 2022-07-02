@@ -1,0 +1,96 @@
+{
+  "KEYINSTRUMENTTEMPLATE": [
+    {
+      "NODE": "ID",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "COARSE",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "FINE",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "LOW",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "HIGH",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "ONESHOT",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "LAYERS",
+      "DEFAULT": "0"
+    }
+  ],
+  "KEYLAYERTEMPLATE": [
+    {
+      "NODE": "NUM",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "VOLUME",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "PAN",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "COARSE",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "CENTS",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "VELSTART",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "VELEND",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "ROOT",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "SAMPLE",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "LOOPEND",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "LOOPSTART",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "DOLOOP",
+      "DEFAULT": "0"
+    }
+  ],
+  "KEYMASTERTEMPLATE": [
+    {
+      "NODE": "NAME",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "INSTRUMENTS",
+      "DEFAULT": "0"
+    },
+    {
+      "NODE": "GROUPS",
+      "DEFAULT": "0"
+    }
+  ]
+}

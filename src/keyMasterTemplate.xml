@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<MPCVObject>
+  <Program type="Keygroup">
+    <ProgramName>##NAME##</ProgramName>
+    <ProgramPads-v2.10/>
+     <KeygroupPitchBendRange>0.160</KeygroupPitchBendRange>
+      <KeygroupWheelToLfo>1.000000</KeygroupWheelToLfo>
+    <Instruments>
+    ##INSTRUMENTS##
+    </Instruments>
+    <KeygroupNumKeygroups>##GROUPS##</KeygroupNumKeygroups>
+    <KeygroupPitchBendRange>0.160000</KeygroupPitchBendRange>
+    <KeygroupWheelToLfo>1.000000</KeygroupWheelToLfo>
+    </Program>
+</MPCVObject>
