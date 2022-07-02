@@ -1,6 +1,6 @@
 # EXS2MPC - EXS24 to Akai MPC Keygroup/DrumKit Converter #
 
-### [Download Zip]() ###
+### [Download Zip](https://github.com/intelliriffer/EXS2MPC/archive/refs/heads/main.zip) ###
 
 ## Features:
 1. Will Automatically Create Keygroup Instrument or Drum Kit based on if all Samples/Zones are ONESHOT or not.
