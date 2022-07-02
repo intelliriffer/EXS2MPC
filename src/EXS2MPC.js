@@ -179,7 +179,7 @@ function process(f) {
 }
 
 /**
- * Closed the Opened File.
+ * Closes the Opened File.
  * @param {File Descriptor} fid 
  */
 
