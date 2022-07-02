@@ -23,7 +23,13 @@ if its still not running try the command : sudo xattr -cr convert_mac.sh
 
 ## Requirements:
 1. Latest NodeJs installed. Download and install Current from : https://nodejs.org/en/
-2. Sox: installation depends on OS (mac users can use homebrew:  brew install sox)
+2. Sox: installation depends on OS. 
+   1. Mac Users
+      1. If you have homebrew, install using command: brew install sox
+      2. or you can install from [MacPorts](https://ports.macports.org/port/sox/)
+   2. Windows Users
+      1. Download From [http://sox.sourceforge.net/](http://sox.sourceforge.net/)
+      2. Install and Add its Path (bin) to System Path (environment)
 
 ## Instructions:
 1: Copy your Exs to EXS_TO_CONVERT Folder (You can use subdirectories to organize)
