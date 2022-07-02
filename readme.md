@@ -4,10 +4,10 @@
 
 ## Features:
 1. Will Automatically Create Keygroup Instrument or Drum Kit based on if all Samples/Zones are ONESHOT or not.
-2. For DrumKits, Exact Midi Note/Pad Mapping is Created, So Pads will Reponse to and Generate Same Midi Note as Source.This is useful if you are want to use midi clips for the captured instrument or perhaps use the original drum machine/plugin for Final Render
-3. Supoports upto 4 velocity Layers (EXS with more layers will be Skipped for now).
-4. Supports upto 128 Zones
-5. Batch Conversion and Directroy Tree Conversion (will convert multiple EXS even in SubFolders)
+2. For DrumKits, Exact Midi Note/Pad Mapping is Created, So Pads will Respond to and Generate Same Midi Note as Source.This is useful if you are want to use midi clips for the captured instrument or perhaps use the original drum machine/plugin for Final Render
+3. Supports up to 4 velocity Layers (EXS with more layers will be Skipped for now).
+4. Supports up to 128 Zones
+5. Batch Conversion and Directory Tree Conversion (will convert multiple EXS even in SubFolders)
 
 ## USAGE 
 1. From Terminal Browse to the EXS2MPC Project Directory 
@@ -18,7 +18,7 @@ OR
 1. Double Click the convert_mac.sh (Mac) or convert_win.bat (windows) Script.
 2: Mac Users, if convert_mac.sh is not running, use terminal 
 and use command chmod +x convert_mac.sh
-if its still not running try the comamnd : sudo xattr -cr convert_mac.sh
+if its still not running try the command : sudo xattr -cr convert_mac.sh
 
 
 ## Requirements:
