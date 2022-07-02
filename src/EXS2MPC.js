@@ -1,6 +1,6 @@
 /*
 *******************************************************************
-Logic/Mainstage EXS24 To Akai MPC Batch Converter v1.0
+Logic/Mainstage EXS24 To Akai MPC Batch Converter v1.01
 *******************************************************************
 
 Features:
@@ -149,7 +149,7 @@ function process(f) {
         if (chunk_type == 0x03) {
             if (![392, 592, 600].includes(size)) {
                 cleanup(fExs);
-                console.log(size);
+                //     console.log(size);
                 ANSI.ERROR("Error Invalid 0x03 Chunk!");
                 return false;
             }
@@ -240,6 +240,8 @@ function createSample(fid, ix, size) {
     S.type = readByteSum(fid, DWORD, ix + 112);
     S.path = readStr(fid, 256, ix + 164);
     S.fileName = readStr(fid, size > 420 ? 256 : 64, size > 420 ? ix + 420 : ix + 20);
+    //console.log(S.name, S.fileName);
+
     return (S);
 
 }
@@ -380,75 +382,80 @@ function validateSamples(j, f) {
  * If all Zones in Keygroup are OneShot, The Generated File with be Type: Drum Kit
  */
 function renderMPC(xs, f) {
-    let isDrum = true;
-    let DMAP = [];
-    let fo = f.split(".").slice(0, -1).join(".") + ".xpm";
-    let master = MPC_TEMPLATES.MASTER;
-    master = TR(master, 'NAME', path.basename(f, ".exs"));
-    master = TR(master, 'GROUPS', xs.uniqueZones.length);
-    let INS = [];
-    xs.uniqueZones.sort((a, b) => a - b);
+    try {
+        let isDrum = true;
+        let DMAP = [];
+        let fo = f.split(".").slice(0, -1).join(".") + ".xpm";
+        let master = MPC_TEMPLATES.MASTER;
+        master = TR(master, 'NAME', path.basename(f, ".exs"));
+        master = TR(master, 'GROUPS', xs.uniqueZones.length);
+        let INS = [];
+        xs.uniqueZones.sort((a, b) => a - b);
 
-    let error = false;
-    xs.uniqueZones.forEach((uz, index) => {
-        let zones = xs.zones.filter(z => z.UID == uz);
-        let z = zones[0];
-        if (zones.length > 4) {
-            doRanges(zones);
-            error = 1;
-            return;
-        };
+        let error = false;
+        xs.uniqueZones.forEach((uz, index) => {
+            let zones = xs.zones.filter(z => z.UID == uz);
+            let z = zones[0];
+            if (zones.length > 4) {
+                doRanges(zones);
+                error = 1;
+                return;
+            };
 
-        let I = MPC_TEMPLATES.INSTRUMENT;
-        DMAP.push(z.key);
-        I = TR(I, 'ID', index + 1);
-        I = TR(I, 'COARSE', z.coarseTune);
-        I = TR(I, 'FINE', z.fineTune);
-        I = TR(I, 'LOW', z.keyLow);
-        I = TR(I, 'HIGH', z.keyHigh);
-        I = TR(I, 'ONESHOT', z.oneShot ? 'True' : 'False');
-        if (!z.oneShot) isDrum = false;
-        let IL = [];
-        zones.forEach((lz, lx) => {
-            let L = MPC_TEMPLATES.LAYER;
-            L = TR(L, 'NUM', lx + 1);
-            L = TR(L, 'VOLUME', toAkaiDb(lz.volume));
-            L = TR(L, 'PAN', "0.50");
-            L = TR(L, 'COARSE', lz.coarseTune);
-            L = TR(L, 'CENTS', lz.fineTune);
-            L = TR(L, 'VELSTART', lz.velLow);
-            L = TR(L, 'VELEND', lz.velHign);
-            L = TR(L, 'ROOT', parseInt(lz.key) + (RootNoteHack ? 1 : 0));
-            //   console.log("ROOT", parseInt(lz.key) + (RootNoteHack ? 1 : 0));
-            let smpl = xs.samples[lz.sampleIndex];
+            let I = MPC_TEMPLATES.INSTRUMENT;
+            DMAP.push(z.key);
+            I = TR(I, 'ID', index + 1);
+            I = TR(I, 'COARSE', z.coarseTune);
+            I = TR(I, 'FINE', z.fineTune);
+            I = TR(I, 'LOW', z.keyLow);
+            I = TR(I, 'HIGH', z.keyHigh);
+            I = TR(I, 'ONESHOT', z.oneShot ? 'True' : 'False');
+            if (!z.oneShot) isDrum = false;
+            let IL = [];
+            zones.forEach((lz, lx) => {
+                let L = MPC_TEMPLATES.LAYER;
+                L = TR(L, 'NUM', lx + 1);
+                L = TR(L, 'VOLUME', toAkaiDb(lz.volume));
+                L = TR(L, 'PAN', "0.50");
+                L = TR(L, 'COARSE', lz.coarseTune);
+                L = TR(L, 'CENTS', lz.fineTune);
+                L = TR(L, 'VELSTART', lz.velLow);
+                L = TR(L, 'VELEND', lz.velHign);
+                L = TR(L, 'ROOT', parseInt(lz.key) + (RootNoteHack ? 1 : 0));
+                //   console.log("ROOT", parseInt(lz.key) + (RootNoteHack ? 1 : 0));
+                let smpl = xs.samples[lz.sampleIndex];
 
-            L = TR(L, 'SAMPLE', smpl.fileName.split(".").slice(0, -1).join("."));
-            L = TR(L, 'LOOPEND', lz.loopEnd);
-            L = TR(L, 'LOOPSTART', lz.loopStart);
-            L = TR(L, 'SAMPLESTART', lz.sampleStart);
-            L = TR(L, 'DOLOOP', lz.loopOn ? 1 : 0);
-            Object.keys(MPC_TEMPLATES.DEFAULTS.KEYLAYERTEMPLATE).forEach(k => L = TR(L, k.NODE, k.DEFAULT));
-            IL.push(L);
+                L = TR(L, 'SAMPLE', smpl.fileName.split(".").slice(0, -1).join("."));
+                L = TR(L, 'LOOPEND', lz.loopEnd);
+                L = TR(L, 'LOOPSTART', lz.loopStart);
+                L = TR(L, 'SAMPLESTART', lz.sampleStart);
+                L = TR(L, 'DOLOOP', lz.loopOn ? 1 : 0);
+                Object.keys(MPC_TEMPLATES.DEFAULTS.KEYLAYERTEMPLATE).forEach(k => L = TR(L, k.NODE, k.DEFAULT));
+                IL.push(L);
 
+            });
+            I = TR(I, 'LAYERS', IL.join("\n"));
+            Object.keys(MPC_TEMPLATES.DEFAULTS.KEYINSTRUMENTTEMPLATE).forEach(k => I = TR(I, k.NODE, k.DEFAULT));
+            INS.push(I);
         });
-        I = TR(I, 'LAYERS', IL.join("\n"));
-        Object.keys(MPC_TEMPLATES.DEFAULTS.KEYINSTRUMENTTEMPLATE).forEach(k => I = TR(I, k.NODE, k.DEFAULT));
-        INS.push(I);
-    });
-    if (!error) {
-        if (isDrum) {
-            master = master.replace(`<Program type="Keygroup">`, `<Program type="Drum">`);
-            master = addDrumMap(master, DMAP);
+        if (!error) {
+            if (isDrum) {
+                master = master.replace(`<Program type="Keygroup">`, `<Program type="Drum">`);
+                master = addDrumMap(master, DMAP);
+            }
+
+            master = TR(master, 'INSTRUMENTS', INS.join("\n"));
+
+            Object.keys(MPC_TEMPLATES.DEFAULTS.KEYMASTERTEMPLATE).forEach(k => master = TR(master, k.NODE, k.DEFAULT));
+            fs.writeFileSync(fo, master);
+            ANSI.GREEN(`  >> Generated ${isDrum ? "DrumKit" : "KeyGroup"} <<${fo}>>`);
+        } else {
+
+            ANSI.ERROR(`Error! Exs ${f} Has More than 4 Layers! Not Supported!`);
         }
+    } catch (e) {
+        ANSI.ERROR(`Unable to Create MPC, Due to Unknown Error!\n >>> ${e} \n  in => ${f}`);
 
-        master = TR(master, 'INSTRUMENTS', INS.join("\n"));
-
-        Object.keys(MPC_TEMPLATES.DEFAULTS.KEYMASTERTEMPLATE).forEach(k => master = TR(master, k.NODE, k.DEFAULT));
-        fs.writeFileSync(fo, master);
-        ANSI.GREEN(`  >> Generated ${isDrum ? "DrumKit" : "KeyGroup"} <<${fo}>>`);
-    } else {
-
-        ANSI.ERROR(`Error! Exs ${f} Has More than 4 Layers! Not Supported!`);
     }
 }
 
