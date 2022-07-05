@@ -1,5 +1,5 @@
 # EXS2MPC - EXS24 to Akai MPC Keygroup/DrumKit Converter #
-### Version: 1.02
+### Version: 1.03
 
 ### [Download Zip](https://github.com/intelliriffer/EXS2MPC/archive/refs/heads/main.zip) ###
 
