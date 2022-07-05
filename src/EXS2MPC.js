@@ -2,6 +2,9 @@
 *******************************************************************
 Logic/Mainstage EXS24 To Akai MPC Batch Converter v1.01
 *******************************************************************
+Author: Amit Talwar https://www.amitszone.com / https://midi.amitszone.com
+Github: https://github.com/intelliriffer
+*******************************************************************
 
 Features:
 1. Will Automatically Create Keygroup Instrument or Drum Kit based on if all Samples/Zones are ONESHOT or not.
@@ -429,7 +432,17 @@ function renderMPC(xs, f) {
             I = TR(I, 'ONESHOT', z.oneShot ? 'True' : 'False');
             if (!z.oneShot) isDrum = false;
             let IL = [];
+            let velEnds = minMax(zones, "velHigh");
+
             zones.forEach((lz, lx) => {
+                let vHi = lz.velHign;
+                let vFix = velEnds.MAX.find(e => e.id == lz.id);
+
+                if (vFix && vFix.velHign != 127) {
+                    vHi = 127;
+                    console.log(`.....High Velocity Limit Scaled to 127 from  ${lz.velHign}`);
+                }
+
                 let L = MPC_TEMPLATES.LAYER;
                 L = TR(L, 'NUM', lx + 1);
                 L = TR(L, 'VOLUME', toAkaiDb(lz.volume));
@@ -437,7 +450,8 @@ function renderMPC(xs, f) {
                 L = TR(L, 'COARSE', lz.coarseTune);
                 L = TR(L, 'CENTS', lz.fineTune);
                 L = TR(L, 'VELSTART', lz.velLow);
-                L = TR(L, 'VELEND', lz.velHign);
+                //L = TR(L, 'VELEND', lz.velHign);
+                L = TR(L, 'VELEND', vHi);
                 L = TR(L, 'ROOT', parseInt(lz.key) + (RootNoteHack ? 1 : 0));
                 //   console.log("ROOT", parseInt(lz.key) + (RootNoteHack ? 1 : 0));
                 let smpl = xs.samples[lz.sampleIndex];
@@ -591,4 +605,16 @@ function sampleExists(f) {
     if (fs.existsSync(f)) return true;
     if (fs.existsSync(fn + ".wav")) return true;
     if (fs.existsSync(fn + ".WAV")) return true;
+}
+
+function minMax(arr, key) {
+    let mxi = arr.reduce((prev, current) => prev[key] > current[key] ? prev : current);
+    let mni = arr.reduce((prev, current) => prev[key] <= current[key] ? prev : current);
+    let mx = arr.filter(a => a[key] == mxi[key]);
+    let mn = arr.filter(a => a[key] == mni[key]);
+    return {
+        MAX: mx,
+        MIN: mn
+    }
+
 }
