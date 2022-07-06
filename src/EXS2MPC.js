@@ -63,11 +63,25 @@ const RootNoteHack = true; //true or false
  */
 const useSOX = true; //true or false
 
+/**
+ *  When True Min Keyrange will be scaled to Zero max Max To 127
+ * useful when you only sample a few samples but what then to extent over entire keyrange.
+ */
+const EXTEND_RANGES = true
+
+/**
+ *  When True Max Velocity for max layer will set to 127.
+ * Useful when you have not sampled the max velocity value.
+ */
+const EXTEND_VELOCITIES = true
+
+
 /**************** DECLARATIONS ********************* */
 
 const { ChildProcess } = require('child_process');
 let fs = require('fs');
 let path = require('path');
+const { Z_BINARY } = require('zlib');
 let ANSI = require("./ansi");
 //let ES = require('child-process').execSync();
 let bigE = false;
@@ -281,7 +295,7 @@ function createZone(fid, ix, size) {
     Z.keyHigh = readByteSum(fid, BYTE, ix + 91);
     Z.velRangeOn = (zopts & (1 << 3)) != 0;
     Z.velLow = readByteSum(fid, BYTE, ix + 93);
-    Z.velHign = readByteSum(fid, BYTE, ix + 94);
+    Z.velHigh = readByteSum(fid, BYTE, ix + 94);
     Z.sampleStart = readByteSum(fid, DWORD, ix + 96);
     Z.sampleEnd = readByteSum(fid, DWORD, ix + 100);
     Z.loopStart = readByteSum(fid, DWORD, ix + 104);
@@ -413,6 +427,9 @@ function renderMPC(xs, f) {
         xs.uniqueZones.sort((a, b) => a - b);
 
         let error = false;
+        let ranges = minMax(xs.zones, "keyLow", "keyHigh");
+        console.log(ranges.MAX);
+        //console.log(ranges.MIN, ranges.MAX);
         xs.uniqueZones.forEach((uz, index) => {
             let zones = xs.zones.filter(z => z.UID == uz);
             let z = zones[0];
@@ -422,25 +439,44 @@ function renderMPC(xs, f) {
                 return;
             };
 
+            let rangeLow = z.keyLow;
+            let rangeHigh = z.keyHigh;
+            let mxFind = ranges.MAX.find(r => r.id == z.id);
+            if (EXTEND_RANGES) {
+                if (mxFind && mxFind.keyHigh < 127) {
+                    rangeHigh = 127;
+                    console.log('range Extended to 127');
+                }
+
+                let mnFind = ranges.MIN.find(r => r.id == z.id);
+                if (mnFind && mnFind.keyLow > 0) {
+                    rangeLow = 0;
+                    console.log('range Extended to 0');
+                }
+            }
             let I = MPC_TEMPLATES.INSTRUMENT;
             DMAP.push(z.key);
+            console.log(z.UID);
             I = TR(I, 'ID', index + 1);
             I = TR(I, 'COARSE', z.coarseTune);
             I = TR(I, 'FINE', z.fineTune);
-            I = TR(I, 'LOW', z.keyLow);
-            I = TR(I, 'HIGH', z.keyHigh);
+            I = TR(I, 'LOW', rangeLow);
+            I = TR(I, 'HIGH', rangeHigh);
             I = TR(I, 'ONESHOT', z.oneShot ? 'True' : 'False');
+
             if (!z.oneShot) isDrum = false;
             let IL = [];
-            let velEnds = minMax(zones, "velHigh");
-
+            let velEnds = minMax(zones, "velHigh", "velLow");
+            //console.log(zones.length, zones.map(z => z.id), velEnds.MAX.map(z => z.id));
             zones.forEach((lz, lx) => {
-                let vHi = lz.velHign;
-                let vFix = velEnds.MAX.find(e => e.id == lz.id);
+                let vHi = lz.velHigh;
+                if (EXTEND_VELOCITIES) {
+                    let vFix = velEnds.MAX.find(e => e.id == lz.id);
 
-                if (vFix && vFix.velHign != 127) {
-                    vHi = 127;
-                    console.log(`.....High Velocity Limit Scaled to 127 from  ${lz.velHign}`);
+                    if (Fix && vFix.velHigh != 127) {
+                        vHi = 127;
+                        console.log(`.....High Velocity Limit Scaled to 127 from  ${lz.velHigh}`);
+                    }
                 }
 
                 let L = MPC_TEMPLATES.LAYER;
@@ -450,7 +486,7 @@ function renderMPC(xs, f) {
                 L = TR(L, 'COARSE', lz.coarseTune);
                 L = TR(L, 'CENTS', lz.fineTune);
                 L = TR(L, 'VELSTART', lz.velLow);
-                //L = TR(L, 'VELEND', lz.velHign);
+                //L = TR(L, 'VELEND', lz.velHigh);
                 L = TR(L, 'VELEND', vHi);
                 L = TR(L, 'ROOT', parseInt(lz.key) + (RootNoteHack ? 1 : 0));
                 //   console.log("ROOT", parseInt(lz.key) + (RootNoteHack ? 1 : 0));
@@ -516,7 +552,7 @@ function doRanges(zones) {
    
        zones.forEach(z => {
    
-           console.log(z.velLow, z.velHign, z.groupIndex, z.sampleIndex);
+           console.log(z.velLow, z.velHigh, z.groupIndex, z.sampleIndex);
        });*/
 }
 
@@ -607,11 +643,12 @@ function sampleExists(f) {
     if (fs.existsSync(fn + ".WAV")) return true;
 }
 
-function minMax(arr, key) {
-    let mxi = arr.reduce((prev, current) => prev[key] > current[key] ? prev : current);
-    let mni = arr.reduce((prev, current) => prev[key] <= current[key] ? prev : current);
-    let mx = arr.filter(a => a[key] == mxi[key]);
-    let mn = arr.filter(a => a[key] == mni[key]);
+function minMax(arr, maxKey, minKey) {
+    let mxi = arr.reduce((prev, current) => prev[maxKey] > current[maxKey] ? prev : current);
+    let mx = arr.filter(a => parseInt(a[maxKey]) == parseInt(mxi[maxKey]));
+    let mni = arr.reduce((prev, current) => prev[minKey] <= current[minKey] ? prev : current);
+    let mn = arr.filter(a => parseInt(a[minKey]) == parseInt(mni[minKey]));
+
     return {
         MAX: mx,
         MIN: mn
