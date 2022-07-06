@@ -428,7 +428,7 @@ function renderMPC(xs, f) {
 
         let error = false;
         let ranges = minMax(xs.zones, "keyLow", "keyHigh");
-        console.log(ranges.MAX);
+
         //console.log(ranges.MIN, ranges.MAX);
         xs.uniqueZones.forEach((uz, index) => {
             let zones = xs.zones.filter(z => z.UID == uz);
@@ -445,18 +445,18 @@ function renderMPC(xs, f) {
             if (EXTEND_RANGES) {
                 if (mxFind && mxFind.keyHigh < 127) {
                     rangeHigh = 127;
-                    console.log('range Extended to 127');
+                    console.log('Max range Extended to 127');
                 }
 
                 let mnFind = ranges.MIN.find(r => r.id == z.id);
                 if (mnFind && mnFind.keyLow > 0) {
                     rangeLow = 0;
-                    console.log('range Extended to 0');
+                    console.log('Min range Extended to 0');
                 }
             }
             let I = MPC_TEMPLATES.INSTRUMENT;
             DMAP.push(z.key);
-            console.log(z.UID);
+
             I = TR(I, 'ID', index + 1);
             I = TR(I, 'COARSE', z.coarseTune);
             I = TR(I, 'FINE', z.fineTune);
@@ -473,7 +473,7 @@ function renderMPC(xs, f) {
                 if (EXTEND_VELOCITIES) {
                     let vFix = velEnds.MAX.find(e => e.id == lz.id);
 
-                    if (Fix && vFix.velHigh != 127) {
+                    if (vFix && vFix.velHigh != 127) {
                         vHi = 127;
                         console.log(`.....High Velocity Limit Scaled to 127 from  ${lz.velHigh}`);
                     }
