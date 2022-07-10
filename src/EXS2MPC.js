@@ -506,13 +506,14 @@ function renderMPC(xs, f) {
             INS.push(I);
         });
         if (!error) {
-            if (isDrum) {
-                master = master.replace(`<Program type="Keygroup">`, `<Program type="Drum">`);
-                master = addDrumMap(master, DMAP);
-            }
 
             master = TR(master, 'INSTRUMENTS', INS.join("\n"));
+            if (isDrum) {
+                master = master.replace(`<Program type="Keygroup">`, `<Program type="Drum">`);
+                master = master.replaceAll(`<LfoPitch>0.044000</LfoPitch>`, `<LfoPitch>0.0000</LfoPitch>`);
 
+                master = addDrumMap(master, DMAP);
+            }
             Object.keys(MPC_TEMPLATES.DEFAULTS.KEYMASTERTEMPLATE).forEach(k => master = TR(master, k.NODE, k.DEFAULT));
             fs.writeFileSync(fo, master);
             ANSI.GREEN(`  >> Generated ${isDrum ? "DrumKit" : "KeyGroup"} <<${fo}>>`);
