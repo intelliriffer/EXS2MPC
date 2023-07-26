@@ -493,7 +493,7 @@ function renderMPC(xs, f) {
                 let smpl = xs.samples[lz.sampleIndex];
 
                 L = TR(L, 'SAMPLE', smpl.fileName.split(".").slice(0, -1).join("."));
-                L = TR(L, 'LOOPEND', lz.loopEnd);
+                L = TR(L, 'LOOPEND', lz.loopEnd - 1);
                 L = TR(L, 'LOOPSTART', lz.loopStart);
                 L = TR(L, 'SAMPLESTART', lz.sampleStart);
                 L = TR(L, 'DOLOOP', lz.loopOn ? 1 : 0);
